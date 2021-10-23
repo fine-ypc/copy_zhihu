@@ -1,7 +1,9 @@
 <template>
   <div class="input-validate-container">
     <input type="text" class="form-control" :class="{'is-invalid': inputRef.error}" :value="modelValue"
-           @input="updateValue" @blur="validateInput" v-bind="$attrs">
+           @input="updateValue" @blur="validateInput" v-bind="$attrs" v-if="tag!=='textarea'">
+    <textarea type="text" class="form-control" :class="{'is-invalid': inputRef.error}" :value="modelValue"
+           @input="updateValue" @blur="validateInput" v-bind="$attrs" v-else />
     <span class="invalid-feedback" style="display: block" v-if="inputRef.error">{{ inputRef.message }}</span>
   </div>
 </template>
@@ -15,10 +17,15 @@ interface RuleProp {
   message: string
 }
 export type RulesProp = RuleProp[]
+export type TagType = 'input' | 'textarea'
 export default defineComponent({
   props: {
     rules: Array as PropType<RulesProp>,
-    modelValue: String
+    modelValue: String,
+    tag: { // 增加input类别可选
+      type: String as PropType<TagType>,
+      default: 'input'
+    }
   },
   inheritAttrs: false, // 禁止根标签继承属性
   setup (props, context) { // context结构出emit
@@ -30,7 +37,7 @@ export default defineComponent({
     const updateValue = (e: KeyboardEvent) => {
       const targetValue = (e.target as HTMLInputElement).value
       inputRef.val = targetValue
-      context.emit('update:modelValue', targetValue)
+      context.emit('update:modelValue', targetValue) // 这里抛出了update事件
     }
     onMounted(() => {
       emitter.emit('form-item-created', validateInput) // 把验证函数传给父组件form

@@ -1,14 +1,14 @@
 <template>
   <nav class="navbar navbar-dark bg-dark justify-content-between mb-4 px-4">
-    <a class="navbar-brand">T</a>
+    <router-link to="/" class="navbar-brand">T</router-link>
     <ul v-if="!user.isLogin" class="list-inline mb-0">
-      <li class="list-inline-item"><a class="btn btn-outline-light my-2">登陆</a></li>
-      <li class="list-inline-item"><a class="btn btn-outline-light my-2">注册</a></li>
+      <li class="list-inline-item"><router-link to="/login" class="btn btn-outline-light my-2">登陆</router-link></li>
+      <li class="list-inline-item"><router-link to="/login" class="btn btn-outline-light my-2">注册</router-link></li>
     </ul>
     <ul v-else class="list-inline mb-0">
       <li class="list-inline-item">
         <dropdown :title="`hi ${user.name}`">
-          <dropdown-item disabled><a class="dropdown-item">新建文章</a></dropdown-item>
+          <dropdown-item><router-link to="/post/create" class="dropdown-item">新建文章</router-link></dropdown-item>
           <dropdown-item><a class="dropdown-item">我的专栏</a></dropdown-item>
         </dropdown>
       </li>
@@ -30,13 +30,7 @@
 import { defineComponent, PropType } from 'vue'
 import Dropdown from './DropDown.vue'
 import DropdownItem from './DropdownItem.vue'
-// import { UserProps } from '../store'
-
-export interface UserProps {
-  isLogin: boolean,
-  name?: string,
-  _id?: string;
-}
+import { UserProps } from '../store'
 export default defineComponent({
   name: 'GlobalHeader',
   components: {
