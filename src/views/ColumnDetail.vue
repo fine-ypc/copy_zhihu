@@ -14,7 +14,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue'
+import { defineComponent, computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { useRoute } from 'vue-router'
 import PostList from '../components/PostList.vue'
@@ -27,9 +27,13 @@ export default defineComponent({
   setup () {
     const route = useRoute()
     const store = useStore<GlobalDataProps>()
-    const currentId = +route.params.id // 一个+不知道是啥语法 把string转为number
+    const currentId = route.params.id // 一个+不知道是啥语法 把string转为number
+    onMounted(() => {
+      store.dispatch('fetchColumn', currentId) // 这里加载了专栏信息
+      store.dispatch('fetchPosts', currentId) // 这里加载了state.posts
+    })
     const column = computed(() => store.getters.getColumnById(currentId)) // 使用getters过滤数据
-    const list = computed(() => store.getters.getPostsByCid(currentId))
+    const list = computed(() => store.state.posts)
     return {
       column,
       list

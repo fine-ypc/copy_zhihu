@@ -3,7 +3,7 @@
     <div v-for="column in columnList" :key="column.id" class="col-4 mb-4">
       <div class="card h-100 shadow-sm">  <!--卡片 高度 边框阴影-->
         <div class="card-body text-center">
-          <img :src="column.avatar" :alt="column.title" class="rounded-circle border border-light my-3" >
+          <img :src="column.avatar" :alt="column.title" class="rounded-circle border border-light my-3 avatar" >
           <h5 class="card-title">{{column.title}}</h5>
           <p class="card-text text-left">{{column.description}}</p>
           <router-link :to="`/column/${column.id}`" class="btn btn-outline-primary">进入专栏</router-link>
@@ -40,5 +40,8 @@ export default defineComponent({
 </script>
 
 <style scoped>
-
+.avatar {
+  width: 50px;
+  height: 50px;
+}
 </style>

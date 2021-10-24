@@ -1,4 +1,5 @@
-import { createStore } from 'vuex'
+import { createStore, Commit } from 'vuex'
+import axios from 'axios'
 export interface UserProps {
   isLogin: boolean,
   name?: string,
@@ -6,49 +7,35 @@ export interface UserProps {
   columnId: number
 }
 export interface ColumnProps {
-  id: number;
+  id: string;
   title: string;
   avatar?: string;
   description: string;
 }
 export interface PostProps {
-  id: number;
+  id: string;
   title: string;
   content: string;
   image?: string;
   createdAt: string;
-  columnId: number;
+  column: string;
   author: number;
 }
 export interface GlobalDataProps {
   columns: ColumnProps[]
   posts: PostProps[]
   user: UserProps
+  isLoading: boolean
 }
-export const testData: ColumnProps[] = [
-  {
-    id: 1,
-    title: 'test1的专栏',
-    description: '这是的test1专栏，有一段非常有意思的简介，可以更新一下欧, 这是的test1专栏，有一段非常有意思的简介，可以更新一下欧',
-    avatar: 'http://vue-maker.oss-cn-hangzhou.aliyuncs.com/vue-marker/5ee22dd58b3c4520912b9470.jpg?x-oss-process=image/resize,m_pad,h_150,w_150'
-  }
-]
-
-export const testPosts: PostProps[] = [
-  {
-    id: 1,
-    title: '这是我的第一篇文章',
-    content: '"this is a new post you Very often we will need to map routes with the given pattern to the same component. For example we may have a User component which should be rendered for all users but with dif..."',
-    image: 'http://vue-maker.oss-cn-hangzhou.aliyuncs.com/vue-marker/5ee1980819f4ae08ac78d458.png?x-oss-process=image/resize,m_fill,m_pad,w_200,h_110',
-    createdAt: '2020-06-11 10:34:22',
-    columnId: 1,
-    author: 1
-  }
-]
+const getAndCommit = async (url: string, mutationName: string, commit: Commit) => {
+  const { data } = await axios.get(url)
+  commit(mutationName, data)
+}
 const store = createStore<GlobalDataProps>({ // 传泛型有助于ide语法提示
   state: {
-    columns: testData,
-    posts: testPosts,
+    isLoading: false,
+    columns: [],
+    posts: [],
     user: { name: 'viking', isLogin: true, columnId: 1 }
   },
   mutations: {
@@ -57,14 +44,37 @@ const store = createStore<GlobalDataProps>({ // 传泛型有助于ide语法提�
     },
     createPost (state, newPost) { // 当commit字符串同于函数名时被激活
       state.posts.push(newPost)
+    },
+    fetchColumns (state, rawData) {
+      state.columns = rawData.data.list
+    },
+    fetchColumn (state, rawData) {
+      state.columns = [rawData.data]
+    },
+    fetchPosts (state, rawData) {
+      state.posts = rawData.data.list
+    },
+    setLoading (state, status) {
+      state.isLoading = status
+    }
+  },
+  actions: {
+    fetchColumns (context) {
+      getAndCommit('/columns', 'fetchColumns', context.commit) // 抽象actions中get方法加手动commit
+    },
+    fetchColumn (context, cid) {
+      getAndCommit(`/columns/${cid}`, 'fetchColumn', context.commit)
+    },
+    fetchPosts (context) {
+      getAndCommit('/posts', 'fetchPosts', context.commit)
     }
   },
   getters: {
-    getColumnById: (state) => (id: number) => {
+    getColumnById: (state) => (id: string) => {
       return state.columns.find(c => c.id === id)
     },
-    getPostsByCid: (state) => (cid: number) => {
-      return state.posts.filter(p => p.columnId === cid)
+    getPostsByCid: (state) => (cid: string) => {
+      return state.posts.filter(p => p.column === cid)
     }
   }
 })
