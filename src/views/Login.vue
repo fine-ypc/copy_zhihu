@@ -19,6 +19,7 @@
 <script lang="ts">
 import ValidateInput, { RulesProp } from '@/components/ValidateInput.vue'
 import ValidateForm from '@/components/ValidateForm.vue'
+import createMessage from '@/components/createMessage'
 import { defineComponent, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
@@ -42,10 +43,19 @@ export default defineComponent({
     const router = useRouter()
     const store = useStore()
     const onFormSubmit = (result: boolean) => {
-      console.log(result) // 在这里进行后端api请求的登录
-      if (result) { // 如果登录成功
-        store.commit('login') // 触发login mutation
-        router.push('/') // push就直接跳转了
+      if (result) { // 如果表单参数通过验证
+        const payload = {
+          email: emailValue,
+          passwordValue: passwordValue
+        }
+        store.dispatch('loginAndFetchUser', payload).then(() => {
+          createMessage('登录成功, 2秒后跳转首页', 'success')
+          setTimeout(() => {
+            router.push('/')
+          }, 2000)
+        }).catch(e => {
+          console.log(e.message)
+        })
       } else { // 如果登录失败就清空input v-model绑定了input值
         emailValue.value = ''
         passwordValue.value = ''

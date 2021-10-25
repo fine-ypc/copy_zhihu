@@ -15,7 +15,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onUnmounted } from 'vue'
+import { defineComponent } from 'vue'
+import useDOMCreate from '@/hooks/useDOMCreate'
 
 export default defineComponent({
   props: {
@@ -28,12 +29,7 @@ export default defineComponent({
   },
   setup () { // 遮罩使用teleport传送到一个div下 这使得我们需要手动在html中加入一个节点 这样可能不是一种良好的组件设计
     // 此时我们在setup(在页面渲染前执行)中进行手动创建节点和手动删除节点
-    const node = document.createElement('div')
-    node.id = 'back'
-    document.body.appendChild(node)
-    onUnmounted(() => {
-      document.body.removeChild(node) // axios的拦截器请求结束后设置了 不加载 即移除loading
-    })
+    useDOMCreate('back')
   }
 })
 </script>

@@ -13,8 +13,9 @@ import { defineComponent, reactive, PropType, onMounted } from 'vue'
 import { emitter } from './ValidateForm.vue'
 const emailReg = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
 interface RuleProp {
-  type: 'required' | 'email',
-  message: string
+  type: 'required' | 'email' | 'custom', // custom是用户自定义规则(可以传函数)
+  message: string,
+  validator?: () => boolean
 }
 export type RulesProp = RuleProp[]
 export type TagType = 'input' | 'textarea'
@@ -53,6 +54,9 @@ export default defineComponent({
               break
             case 'email':
               passed = emailReg.test(inputRef.val)
+              break
+            case 'custom':
+              passed = rule.validator ? rule.validator() : true // 有传自定义验证函数就执行 没有就直接返回true
               break
             default:
               break
